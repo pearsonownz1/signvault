@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,8 @@ export default function RegisterPage() {
     }));
   };
 
+  const { signUp } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -58,11 +61,22 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Register with Supabase, passing the full name as metadata
+      const { error } = await signUp(formData.email, formData.password, {
+        full_name: formData.fullName
+      });
 
-      // Registration successful - redirect to login
-      navigate("/login", { state: { registrationSuccess: true } });
+      if (error) {
+        setError(error.message || "Failed to create account");
+      } else {
+        // Registration successful - redirect to login
+        navigate("/login", { 
+          state: { 
+            registrationSuccess: true,
+            message: "Registration successful! Please check your email to confirm your account."
+          } 
+        });
+      }
     } catch (err) {
       setError("An error occurred during registration. Please try again.");
     } finally {

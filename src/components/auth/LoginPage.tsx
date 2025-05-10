@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle2 } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,22 +23,25 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { signIn } = useAuth();
+  const location = useLocation();
+  const registrationSuccess = location.state?.registrationSuccess;
+  const successMessage = location.state?.message || "Registration successful!";
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    // Mock login - in a real app, this would call an authentication API
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // For demo purposes, accept any non-empty email/password
-      if (email && password) {
-        // Successful login
-        navigate("/");
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        setError(error.message || "Failed to sign in");
       } else {
-        setError("Please enter both email and password");
+        // Redirect to dashboard or the page they were trying to access
+        const from = location.state?.from?.pathname || "/dashboard";
+        navigate(from);
       }
     } catch (err) {
       setError("An error occurred during login. Please try again.");
@@ -68,6 +73,13 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit}>
+                {registrationSuccess && (
+                  <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
+                    <AlertDescription>{successMessage}</AlertDescription>
+                  </Alert>
+                )}
+                
                 {error && (
                   <Alert variant="destructive" className="mb-4">
                     <AlertDescription>{error}</AlertDescription>

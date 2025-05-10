@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { useRoutes, Routes, Route } from "react-router-dom";
+import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, ProtectedRoute } from "./lib/AuthContext";
 import Home from "./components/home";
 import IntegrationsPage from "./components/integrations/IntegrationsPage";
 import AuditLogPage from "./components/audit/AuditLogPage";
@@ -14,15 +15,16 @@ import routes from "tempo-routes";
 
 function App() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center h-screen">
-          Loading...
-        </div>
-      }
-    >
-      <>
-        <Routes>
+    <AuthProvider>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-screen">
+            Loading...
+          </div>
+        }
+      >
+        <>
+          <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/features" element={<FeaturesPage />} />
@@ -31,17 +33,53 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/request-demo" element={<DemoRequestPage />} />
 
-          {/* Protected routes - in a real app, these would be protected with auth */}
-          <Route path="/dashboard" element={<Home />} />
-          <Route path="/dashboard/integrations" element={<Home />} />
+          {/* Protected routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/integrations" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/integrations" element={<IntegrationsPage />} />
-          <Route path="/audit" element={<Home />} />
-          <Route path="/settings" element={<Home />} />
-          <Route path="/document/:id" element={<Home />} />
-        </Routes>
-        {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-      </>
-    </Suspense>
+          <Route 
+            path="/audit" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/document/:id" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          </Routes>
+          {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
+        </>
+      </Suspense>
+    </AuthProvider>
   );
 }
 

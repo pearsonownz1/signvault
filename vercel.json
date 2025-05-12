@@ -72,6 +72,10 @@
     "DOCUSIGN_CLIENT_SECRET": "e984fc0d-ec9f-4762-8f0f-8f622b8020b2",
     "DOCUSIGN_REDIRECT_URI": "https://signvault.co/api/docusign/callback",
     "SUPABASE_URL": "https://wypiqtfkzhgrodmehjpf.supabase.co",
-    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk"
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk",
+    "VITE_SUPABASE_URL": "https://wypiqtfkzhgrodmehjpf.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDIzOTcsImV4cCI6MjA2MjQxODM5N30.9YBWG6i1zwA_3V9PT6_BtwIzDdeRHutcOTnMsDgFCWc",
+    "SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk",
+    "VITE_SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk"
   }
 }

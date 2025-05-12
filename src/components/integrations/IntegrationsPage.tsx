@@ -23,7 +23,7 @@ export default function IntegrationsPage() {
       {/* Integrations Grid */}
       <section className="py-24 px-6 max-w-6xl mx-auto text-center space-y-16">
         <h2 className="text-3xl font-bold mb-12">Available Integrations</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Adobe Sign */}
           <div className="space-y-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mx-auto">
@@ -42,10 +42,13 @@ export default function IntegrationsPage() {
               <span className="font-semibold text-blue-600 text-xl">P</span>
             </div>
             <h3 className="text-xl font-semibold">PandaDoc</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Capture finalized PandaDoc documents automatically. Ensure every
               signed contract is safe, permanent, and auditable.
             </p>
+            <Link to="/integrations/pandadoc">
+              <Button variant="outline" size="sm">Connect PandaDoc</Button>
+            </Link>
           </div>
 
           {/* DocuSign */}
@@ -54,10 +57,43 @@ export default function IntegrationsPage() {
               <span className="font-semibold text-yellow-600 text-xl">D</span>
             </div>
             <h3 className="text-xl font-semibold">DocuSign</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Keep your DocuSign process — vault the signed outcomes without
               disruption. Full compliance, minimal setup.
             </p>
+            <Link to="/integrations/docusign">
+              <Button variant="outline" size="sm">Connect DocuSign</Button>
+            </Link>
+          </div>
+          
+          {/* SignNow */}
+          <div className="space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
+              <span className="font-semibold text-green-600 text-xl">S</span>
+            </div>
+            <h3 className="text-xl font-semibold">SignNow</h3>
+            <p className="text-muted-foreground mb-4">
+              Seamlessly integrate with SignNow to automatically vault your signed 
+              documents with complete security and compliance.
+            </p>
+            <Link to="/integrations/signnow">
+              <Button variant="outline" size="sm">Connect SignNow</Button>
+            </Link>
+          </div>
+          
+          {/* API Integration */}
+          <div className="space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 mx-auto">
+              <span className="font-semibold text-purple-600 text-xl">API</span>
+            </div>
+            <h3 className="text-xl font-semibold">Custom API</h3>
+            <p className="text-muted-foreground mb-4">
+              Build your own integration using our secure API. Generate API keys and
+              programmatically vault documents from any system.
+            </p>
+            <Link to="/integrations/api">
+              <Button variant="outline" size="sm">Manage API Keys</Button>
+            </Link>
           </div>
         </div>
       </section>

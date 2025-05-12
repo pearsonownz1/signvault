@@ -1,0 +1,77 @@
+{
+  "rewrites": [
+    { "source": "/api/docusign/callback", "destination": "/api/docusign-callback" },
+    { "source": "/api/webhooks/docusign/new", "destination": "/api/webhooks/docusign-new" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/oauth/docusign/complete", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
+    }
+  ],
+  "functions": {
+    "api/docusign-callback.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/docusign-code-verifier.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/webhooks/docusign.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/webhooks/docusign-new.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/test-supabase-storage.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/test-supabase-simple.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/test-env.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/hello.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/api-keys.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/vault-document.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/get-documents.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/get-document.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "DOCUSIGN_CLIENT_ID": "edb93530-5a23-4584-b6e2-6aef9f724fa7",
+    "DOCUSIGN_CLIENT_SECRET": "e984fc0d-ec9f-4762-8f0f-8f622b8020b2",
+    "DOCUSIGN_REDIRECT_URI": "https://signvault.co/api/docusign/callback",
+    "SUPABASE_URL": "https://wypiqtfkzhgrodmehjpf.supabase.co",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk"
+  }
+}

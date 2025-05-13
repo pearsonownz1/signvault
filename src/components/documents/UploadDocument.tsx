@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAuth } from "@/lib/AuthContext";
+import { vaultDocument } from "@/lib/vaultService";
 import {
   Dialog,
   DialogContent,
@@ -39,26 +41,38 @@ export default function UploadDocument({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { user } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !user) return;
 
     setIsUploading(true);
 
-    // Simulate upload process
-    setTimeout(() => {
-      // Create mock document object
+    try {
+      // Vault the document
+      const vaultedDocument = await vaultDocument(
+        file,
+        user.id,
+        'upload',
+        retention
+      );
+
+      // Create document object for UI
       const newDocument = {
-        id: Math.random().toString(36).substring(2, 9),
+        id: vaultedDocument.id,
         name: file.name,
         source: "Manual Upload",
         signedDate: new Date().toISOString().split("T")[0],
+        vaultedDate: vaultedDocument.vault_time,
         tags: tags
           .split(",")
           .map((tag) => tag.trim())
           .filter((tag) => tag !== ""),
         retention,
         status: "signed" as const,
+        isAuthoritative: true,
+        fileHash: vaultedDocument.file_hash,
       };
 
       onUploadComplete(newDocument);
@@ -67,7 +81,11 @@ export default function UploadDocument({
       setFile(null);
       setTags("");
       setRetention("7 years");
-    }, 1500);
+    } catch (error) {
+      console.error("Error vaulting document:", error);
+      alert("Failed to vault document. Please try again.");
+      setIsUploading(false);
+    }
   };
 
   return (

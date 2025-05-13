@@ -3,14 +3,64 @@ import crypto from 'crypto';
 
 // Initialize Supabase client
 const getSupabaseClient = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  // Check if we're in a browser environment (frontend) or Node.js environment (API)
+  const isNode = typeof window === 'undefined';
   
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase configuration missing');
+  let supabaseUrl, supabaseKey;
+  
+  if (isNode) {
+    // Node.js environment (API)
+    // For API operations, prefer the service role key for admin operations
+    supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || 
+                  process.env.VITE_SUPABASE_SERVICE_KEY;
+    
+    // If service key is not available, fall back to anon key
+    if (!supabaseKey) {
+      supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    }
+    
+    console.log('Node.js environment detected in apiKeyService', {
+      hasViteSupabaseUrl: !!process.env.VITE_SUPABASE_URL,
+      hasSupabaseUrl: !!process.env.SUPABASE_URL,
+      hasViteSupabaseAnonKey: !!process.env.VITE_SUPABASE_ANON_KEY,
+      hasSupabaseAnonKey: !!process.env.SUPABASE_ANON_KEY,
+      hasSupabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      supabaseUrl: supabaseUrl ? 'present' : 'missing',
+      supabaseKey: supabaseKey ? 'present' : 'missing',
+      envKeys: Object.keys(process.env).filter(key => key.includes('SUPABASE'))
+    });
+  } else {
+    // Browser environment (frontend)
+    // For browser operations, always use the anon key
+    supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    console.log('Browser environment detected in apiKeyService', {
+      hasViteSupabaseUrl: !!import.meta.env.VITE_SUPABASE_URL,
+      hasViteSupabaseAnonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+      supabaseUrl: supabaseUrl ? 'present' : 'missing',
+      supabaseKey: supabaseKey ? 'present' : 'missing'
+    });
   }
   
-  return createClient(supabaseUrl, supabaseAnonKey);
+  if (!supabaseUrl || !supabaseKey) {
+    const error = new Error('Supabase configuration missing');
+    console.error('Supabase configuration missing:', {
+      isNode,
+      supabaseUrl: supabaseUrl ? 'present' : 'missing',
+      supabaseKey: supabaseKey ? 'present' : 'missing',
+      envKeys: isNode ? Object.keys(process.env).filter(key => key.includes('SUPABASE')) : null
+    });
+    throw error;
+  }
+  
+  try {
+    return createClient(supabaseUrl, supabaseKey);
+  } catch (error) {
+    console.error('Error creating Supabase client:', error);
+    throw error;
+  }
 };
 
 /**

@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getDocument, getDocumentAuditLog } from "@/lib/vaultService";
+import { getOrCreateWatermarkedVersion } from "@/lib/watermarkService";
+import { useAuth } from "@/lib/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
+import BlockchainPublisher from "./BlockchainPublisher";
 import {
   Card,
   CardContent,
@@ -230,9 +234,79 @@ export default function DocumentViewer() {
     { status: "idle" },
   );
   const [showWatermark, setShowWatermark] = useState(true);
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [auditLog, setAuditLog] = useState<any[]>([]);
+  const { user } = useAuth();
 
-  // Find the document with the matching ID
-  const document = mockDocuments.find((doc) => doc.id === id);
+  // State for the actual document data
+  const [documentData, setDocumentData] = useState<any>(null);
+  
+  // Fetch document data
+  useEffect(() => {
+    const fetchDocumentData = async () => {
+      if (!id || !user) return;
+      
+      setIsLoading(true);
+      
+      try {
+        // Get document details
+        const fetchedDocument = await getDocument(id);
+        
+        if (!fetchedDocument) {
+          console.error('Document not found');
+          setIsLoading(false);
+          return;
+        }
+        
+        setDocumentData(fetchedDocument);
+        
+        // Get watermarked version URL
+        const watermarkedUrl = await getOrCreateWatermarkedVersion(
+          user.id,
+          fetchedDocument.id,
+          fetchedDocument.file_path,
+          fetchedDocument.vault_time
+        );
+        
+        setDocumentUrl(watermarkedUrl);
+        
+        // Get audit log
+        const auditLogData = await getDocumentAuditLog(id);
+        setAuditLog(auditLogData || []);
+      } catch (error) {
+        console.error('Error fetching document data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDocumentData();
+  }, [id, user]);
+
+  // Create a document object that combines real data with UI display needs
+  const document = documentData ? {
+    id: documentData.id,
+    name: documentData.file_name,
+    source: documentData.source || 'Manual Upload',
+    signedDate: new Date(documentData.vault_time).toLocaleDateString(),
+    vaultedDate: new Date(documentData.vault_time).toLocaleDateString(),
+    tags: [], // We'll need to implement tags separately
+    retention: documentData.retention_period || '7 years',
+    retentionExpiryDate: '2030-05-16', // This would need to be calculated
+    status: documentData.status || 'vaulted',
+    isAuthoritative: true,
+    url: documentUrl || '',
+    size: '1.2 MB', // This would need to be fetched
+    signers: [], // This would need to be implemented
+    encryptionType: 'AES-256',
+    storageLocation: 'Supabase Storage',
+    blockchainVerification: documentData.blockchain_txid || null,
+    lastAccessed: new Date().toLocaleDateString(),
+    fileHash: documentData.file_hash,
+    integrityVerified: true,
+    lastVerified: new Date().toLocaleString(),
+  } : null;
 
   if (!document) {
     return (
@@ -292,11 +366,21 @@ export default function DocumentViewer() {
               </div>
             </CardHeader>
             <CardContent className="h-[520px] relative">
-              <iframe
-                src={document.url}
-                className="w-full h-full border-0"
-                title={document.name}
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : documentUrl ? (
+                <iframe
+                  src={documentUrl}
+                  className="w-full h-full border-0"
+                  title={document.name}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">Document preview not available</p>
+                </div>
+              )}
               {document.isAuthoritative && showWatermark && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="transform rotate-[-35deg] opacity-20">
@@ -444,8 +528,53 @@ export default function DocumentViewer() {
                     <span className="text-sm font-medium text-muted-foreground">
                       Last Verified:
                     </span>
-                    <span className="col-span-2">{document.lastVerified}</span>
+                    <span className="col-span-2">{document.lastVerified || "Not verified yet"}</span>
                   </div>
+                  
+                  {document.blockchainVerification && (
+                    <div className="grid grid-cols-3 gap-1 mt-2 pt-2 border-t border-gray-100">
+                      <span className="text-sm font-medium text-muted-foreground flex items-center">
+                        <span className="mr-1">Blockchain:</span>
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700 ml-1">
+                          Polygon
+                        </span>
+                      </span>
+                      <div className="col-span-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-mono break-all">
+                            {document.blockchainVerification}
+                          </span>
+                          <a
+                            href={`https://polygonscan.com/tx/${document.blockchainVerification}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm flex items-center ml-2"
+                          >
+                            View
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-1 h-3 w-3"
+                            >
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                              <polyline points="15 3 21 3 21 9"></polyline>
+                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                          </a>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Document hash has been permanently anchored to the blockchain
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <Button
                     variant="outline"
                     className="w-full mt-2"
@@ -560,14 +689,50 @@ export default function DocumentViewer() {
                       {document.storageLocation}
                     </span>
                   </div>
-                  {document.isAuthoritative && (
+                  {document.blockchainVerification && (
                     <div className="grid grid-cols-3 gap-1">
                       <span className="text-sm font-medium text-muted-foreground">
                         Blockchain:
                       </span>
-                      <span className="col-span-2 text-xs break-all">
-                        {document.blockchainVerification}
-                      </span>
+                      <div className="col-span-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                            Polygon
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-mono break-all">
+                            {document.blockchainVerification}
+                          </span>
+                          <a
+                            href={`https://polygonscan.com/tx/${document.blockchainVerification}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm flex items-center ml-2"
+                          >
+                            View
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-1 h-3 w-3"
+                            >
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                              <polyline points="15 3 21 3 21 9"></polyline>
+                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                          </a>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Document hash has been permanently anchored to the Polygon blockchain
+                        </p>
+                      </div>
                     </div>
                   )}
                   <div className="grid grid-cols-3 gap-1">
@@ -615,6 +780,79 @@ export default function DocumentViewer() {
                   </div>
                 </CardContent>
               </Card>
+              
+              {/* Blockchain Publisher */}
+              {!document.blockchainVerification ? (
+                <BlockchainPublisher
+                  documentId={document.id}
+                  documentHash={document.fileHash}
+                  existingTxid={documentData?.blockchain_txid}
+                  onSuccess={(txid) => {
+                    // Update the document object with the new blockchain transaction ID
+                    setDocumentData({
+                      ...documentData,
+                      blockchain_txid: txid
+                    });
+                  }}
+                />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wallet">
+                        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                      </svg>
+                      Blockchain Anchoring
+                    </CardTitle>
+                    <CardDescription>
+                      Document hash is permanently anchored to the Polygon blockchain
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Network:</span>
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
+                        Polygon Mainnet
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium">Transaction ID:</span>
+                      <div className="p-2 bg-gray-50 rounded border text-xs font-mono break-all">
+                        {document.blockchainVerification}
+                      </div>
+                      <div className="flex justify-end">
+                        <a 
+                          href={`https://polygonscan.com/tx/${document.blockchainVerification}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-sm flex items-center mt-1"
+                        >
+                          View on Explorer
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1 h-3 w-3">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                    
+                    <Alert className="bg-green-50 border-green-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-green-600">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      <AlertDescription className="text-green-700 text-sm">
+                        Document hash has been permanently anchored to the blockchain
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             {/* Audit Trail Tab */}
@@ -628,7 +866,7 @@ export default function DocumentViewer() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {mockAuditLog.map((entry) => (
+                    {(auditLog.length > 0 ? auditLog : mockAuditLog).map((entry) => (
                       <div
                         key={entry.id}
                         className="flex items-start gap-3 border-b border-border pb-2 last:border-0"

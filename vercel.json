@@ -65,6 +65,14 @@
     "api/get-document.js": {
       "memory": 1024,
       "maxDuration": 30
+    },
+    "api/test-api-keys.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/standalone-api-keys.js": {
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "env": {
@@ -76,6 +84,7 @@
     "VITE_SUPABASE_URL": "https://wypiqtfkzhgrodmehjpf.supabase.co",
     "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDIzOTcsImV4cCI6MjA2MjQxODM5N30.9YBWG6i1zwA_3V9PT6_BtwIzDdeRHutcOTnMsDgFCWc",
     "SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk",
-    "VITE_SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk"
+    "VITE_SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg0MjM5NywiZXhwIjoyMDYyNDE4Mzk3fQ.K023fzCEIONLXDsTIdSrB8XRcONb2pZukxOeq1UznZk",
+    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5cGlxdGZremhncm9kbWVoanBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDIzOTcsImV4cCI6MjA2MjQxODM5N30.9YBWG6i1zwA_3V9PT6_BtwIzDdeRHutcOTnMsDgFCWc"
   }
 }

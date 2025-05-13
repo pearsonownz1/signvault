@@ -23,12 +23,12 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full h-16 bg-white border-b border-gray-200">
+    <header className="w-full h-24 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto h-full px-4 flex items-center justify-between">
         {/* Logo */}
         <div>
           <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-semibold text-primary">SignVault</h1>
+            <img src="/logo.png" alt="SignVault Logo" className="h-[100px] mr-2" />
           </Link>
         </div>
 

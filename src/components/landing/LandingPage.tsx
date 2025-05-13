@@ -563,12 +563,12 @@ export default function LandingPage() {
           <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-muted-foreground text-sm">
             <p>© {new Date().getFullYear()} SignVault. All rights reserved.</p>
             <div className="flex gap-4 mt-4 md:mt-0">
-              <a href="#" className="hover:text-foreground">
+              <Link to="/privacy" className="hover:text-foreground">
                 Privacy
-              </a>
-              <a href="#" className="hover:text-foreground">
+              </Link>
+              <Link to="/terms" className="hover:text-foreground">
                 Terms
-              </a>
+              </Link>
               <a href="#" className="hover:text-foreground">
                 Security
               </a>
